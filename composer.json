@@ -1,0 +1,20 @@
+{
+    "name": "douglas/cli-csv-reader",
+    "description": "A simple PHP CLI tool to read `.csv` files and import data into a MySQL database using Docker Compose.",
+    "type": "project",
+    "require": {
+        "robmorgan/phinx": "^0.16.10",
+        "phpunit/phpunit": "^12.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "CliCsvReader\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Douglas Vicentini",
+            "email": "douglas.dvferreira@gmail.com"
+        }
+    ]
+}

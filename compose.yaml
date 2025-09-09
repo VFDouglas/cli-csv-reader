@@ -1,0 +1,35 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        DOCKERFILE_DIRECTORY: ${APP_ENV:-local}
+    networks:
+      - internal
+    volumes:
+      - ./:/app
+    working_dir: /app
+    container_name: ${APP_NAME}_php_${APP_ENV}
+    tty: true
+  mysql:
+    networks:
+      - internal
+    image: 'mysql:8.0'
+    volumes:
+      - ./.docker/mysql/dbdata:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-store}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+    container_name: ${APP_NAME}_mysql_${APP_ENV}
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+networks:
+  internal:
+    driver: bridge
