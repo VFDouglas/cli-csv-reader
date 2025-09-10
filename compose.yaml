@@ -4,12 +4,12 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
       args:
-        DOCKERFILE_DIRECTORY: ${APP_ENV:-local}
+        CONTAINER_USER: ${PHP_CONTAINER_USER}
+        CONTAINER_ROOT_PASSWORD: ${PHP_CONTAINER_ROOT_PASSWORD}
     networks:
       - internal
     volumes:
-      - ./:/app
-    working_dir: /app
+      - ./:/var/www/html
     container_name: ${APP_NAME}_php_${APP_ENV}
     tty: true
   mysql:
@@ -21,7 +21,7 @@ services:
     ports:
       - '3306:3306'
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-store}
+      MYSQL_DATABASE: ${DB_NAME:-store}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_PASSWORD: ${DB_PASSWORD:-root}
     container_name: ${APP_NAME}_mysql_${APP_ENV}

@@ -19,19 +19,9 @@ Clone the project
 ```
 git clone https://github.com/VFDouglas/cli-csv-reader.git
 ```
-Enter the project:
+Run the installer script (Check file for details):
 ```
-cd cli-csv-reader
-```
-Create a `.env` file:
-```
-cp .env.example .env
-```
-Run the commands:
-```
-docker compose build php --no-cache
-docker compose up -d
-docker compose exec php composer install
+./install.sh
 ```
 
 You can access the app containers with the command:
