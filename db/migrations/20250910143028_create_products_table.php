@@ -11,7 +11,6 @@ final class CreateProductsTable extends AbstractMigration
     {
         $products = $this->table('products');
         $products
-            ->addColumn('id', 'integer', ['autoincrement' => true])
             ->addColumn('gtin', 'string', ['limit' => 50, 'null' => false, 'comment' => 'Global Trade Item Number'])
             ->addColumn('language', 'string', ['limit' => 5, 'null' => false])
             ->addColumn('title', 'string', ['limit' => 255, 'null' => false])
