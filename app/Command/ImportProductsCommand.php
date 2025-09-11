@@ -33,6 +33,7 @@ class ImportProductsCommand extends Command
         $files = glob(__DIR__ . '/../../storage/products/*.csv');
         if (empty($files)) {
             $io->error('<info>No products found.</info>');
+
             return Command::FAILURE;
         }
 
@@ -51,8 +52,8 @@ class ImportProductsCommand extends Command
         $io->writeln("Importing products from path: $filePath");
 
         $fileReader = FileReaderFactory::create($filePath);
-        $fileReader->save($filePath, new ProductRepository());
+        $result     = $fileReader->save($filePath, new ProductRepository());
 
-        return Command::SUCCESS;
+        return $result ? Command::SUCCESS : Command::FAILURE;
     }
 }

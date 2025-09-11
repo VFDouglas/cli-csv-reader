@@ -2,6 +2,7 @@
 
 namespace App\FileReaders;
 
+use App\Exceptions\MissingFileFieldException;
 use App\Exceptions\UnableToOpenFileException;
 use App\Interfaces\FileReaderInterface;
 use App\Interfaces\QueryResultInterface;
@@ -14,6 +15,7 @@ class CsvReader implements FileReaderInterface
 
     /**
      * @throws UnableToOpenFileException
+     * @throws MissingFileFieldException
      */
     public function read(string $path): Generator
     {
@@ -30,13 +32,18 @@ class CsvReader implements FileReaderInterface
         }
 
         while (($row = fgetcsv($handle)) !== false) {
+            if (count($headers) !== count($row)) {
+                throw new MissingFileFieldException(
+                    "The header and rows are not compatible. Check file to see if something is missing or exceeding."
+                );
+            }
             yield array_combine($headers, $row);
         }
         fclose($handle);
     }
 
     /**
-     * @throws UnableToOpenFileException
+     * @throws UnableToOpenFileException|MissingFileFieldException
      */
     public function save(string $path, RepositoryInterface $repository): bool
     {
@@ -69,7 +76,8 @@ class CsvReader implements FileReaderInterface
         if ($queryResult->isSuccess()) {
             echo "Success importing from lines " . ($offset + 1) . " to " . ($offset + $limit) . ".\n";
         } else {
-            echo "Error importing from lines " . ($offset + 1) . " to " . ($offset + $limit) . ".\n";
+            echo "Error importing from lines " . ($offset + 1) . " to " . ($offset + $limit) .
+                ":\n" . implode("\n", $queryResult->getErrors()) . "\n";
         }
     }
 }

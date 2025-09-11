@@ -21,7 +21,7 @@ class Database
         $this->bindMultipleParams($stmt, $params);
 
         $success = $stmt->execute();
-        $result = new InsertResultDTO();
+        $result  = new InsertResultDTO();
 
         return $result
             ->setErrors($stmt->errorInfo())
@@ -30,15 +30,47 @@ class Database
             ->setAffectedRows($stmt->rowCount());
     }
 
-    public function executeMultiple(string $sql, array $paramsList = []): InsertResultDTO
+    public function batchInsert(string $table, array $rows, array $updateColumns = []): InsertResultDTO
     {
+        $result = new InsertResultDTO();
+
+        $placeholders = [];
+        $params       = [];
+        $columns      = array_keys($rows[0]);
+
+        foreach ($rows as $rowKey => $row) {
+            $rowPlaceholders = [];
+            foreach ($columns as $column) {
+                $paramKey          = "{$column}_$rowKey";
+                $rowPlaceholders[] = ":$paramKey";
+                $params[$paramKey] = $row[$column];
+            }
+            $placeholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
+        }
+
+        if (empty($updateColumns)) {
+            $sql = sprintf(
+                "INSERT INTO %s (%s) VALUES (%s)",
+                $table,
+                implode(', ', $rows),
+                implode(', ', $placeholders),
+            );
+        } else {
+            $sql = sprintf(
+                "INSERT INTO %s (%s) VALUES %s ON DUPLICATE KEY UPDATE %s",
+                $table,
+                implode(', ', $columns),
+                implode(', ', $placeholders),
+                implode(', ', array_map(fn($col) => "$col = VALUES($col)", $updateColumns)),
+            );
+        }
         $stmt = $this->connection->prepare($sql);
-        foreach ($paramsList as $params) {
-            $this->bindMultipleParams($stmt, $params);
+
+        foreach ($params as $paramKey => $paramValue) {
+            $this->bindParamType($stmt, $paramKey, $paramValue);
         }
 
         $success = $stmt->execute();
-        $result = new InsertResultDTO();
 
         return $result
             ->setErrors($stmt->errorInfo())
@@ -56,20 +88,25 @@ class Database
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    private function bindParamType(PDOStatement $statement, string $paramKey, mixed $paramValue): void
+    {
+        switch (gettype($paramValue)) {
+            case 'integer':
+                $statement->bindValue(":$paramKey", $paramValue, PDO::PARAM_INT);
+                break;
+            case 'boolean':
+                $statement->bindValue(":$paramKey", $paramValue, PDO::PARAM_BOOL);
+                break;
+            default:
+                $statement->bindValue(":$paramKey", $paramValue);
+                break;
+        }
+    }
+
     private function bindMultipleParams(PDOStatement $statement, array $params): void
     {
         foreach ($params as $paramKey => $paramValue) {
-            switch (gettype($paramValue)) {
-                case 'integer':
-                    $statement->bindValue(":$paramKey", $paramValue, PDO::PARAM_INT);
-                    break;
-                case 'boolean':
-                    $statement->bindValue(":$paramKey", $paramValue, PDO::PARAM_BOOL);
-                    break;
-                default:
-                    $statement->bindValue(":$paramKey", $paramValue);
-                    break;
-            }
+            $this->bindParamType($statement, $paramKey, $paramValue);
         }
     }
 }

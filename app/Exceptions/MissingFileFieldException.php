@@ -4,6 +4,6 @@ namespace App\Exceptions;
 
 use Exception;
 
-class UnableToOpenFileException extends Exception
+class MissingFileFieldException extends Exception
 {
 }
