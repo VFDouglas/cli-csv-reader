@@ -1,5 +1,5 @@
 {
-    "name": "douglas/cli-csv-reader",
+    "name": "douglas/cli-file-reader",
     "description": "A simple PHP CLI tool to read `.csv` files and import data into a MySQL database using Docker Compose.",
     "type": "project",
     "require": {
@@ -11,7 +11,7 @@
     },
     "autoload": {
         "psr-4": {
-            "CliCsvReader\\": "app/"
+            "App\\": "app/"
         },
         "files": [
             "app/Helpers/helpers.php"

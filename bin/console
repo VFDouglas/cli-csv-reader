@@ -3,7 +3,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use CliCsvReader\Command\ImportProductsCommand;
+use App\Command\ImportProductsCommand;
 use Symfony\Component\Console\Application;
 
 $app = new Application('Product CSV Importer', '1.0.0');

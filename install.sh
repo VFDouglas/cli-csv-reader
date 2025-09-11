@@ -9,3 +9,4 @@ docker compose up -d
 docker compose exec php composer install --no-dev --optimize-autoloader --prefer-dist --classmap-authoritative
 docker compose exec php composer update --no-dev --optimize-autoloader --prefer-dist --classmap-authoritative
 docker compose exec php composer dump-autoload -o
+docker compose exec php vendor/bin/phinx migrate
