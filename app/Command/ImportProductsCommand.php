@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\DTO\FileReaderConfigDTO;
 use App\Exceptions\UnsupportedFileFormatException;
 use App\Factories\FileReaderFactory;
 use App\Repositories\ProductRepository;
@@ -15,6 +16,8 @@ class ImportProductsCommand extends Command
 {
     private const string INVALID_CHOICE = '🚨 Oops! "%s" is not a valid choice. Please try again.';
 
+    private const string STORAGE_PATH = __DIR__ . '/../../storage/products';
+
     protected function configure(): void
     {
         $this->setName('import:products')->setDescription('Imports products from a CSV file');
@@ -27,33 +30,56 @@ class ImportProductsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->writeln('<info>Hello! Here you\'ll be able to import products from a CSV file interactively.</info>');
-        $io->writeln("<info>Please make sure the files are in the storage/products directory.</info>");
+        $io->title('Product Import Wizard');
+        $io->text(
+            "Please make sure the files are in the storage/products directory and are enclosed between quotes" .
+            " or single quotes."
+        );
 
-        $files = glob(__DIR__ . '/../../storage/products/*.csv');
+        $files = glob(self::STORAGE_PATH . '/*.csv');
         if (empty($files)) {
-            $io->error('<info>No products found.</info>');
+            $io->error('<info>No files found in storage.</info>');
 
             return Command::FAILURE;
         }
 
-        $io->writeln("\n<info>Here are the files found:</info>");
+        $fileChoices      = array_map('basename', $files);
+        $separators       = [',' => 'Comma', ';' => 'Semi-colon', "\t" => 'Tab'];
+        $separatorChoices = array_values($separators);
 
-        $choices  = array_map('basename', $files);
-        $question = new ChoiceQuestion('Please select a CSV file to import:', $choices, 0);
-        $question->setErrorMessage(self::INVALID_CHOICE);
-        $selectedFile = $io->askQuestion($question);
+        $file      = $this->askQuestion($io, 'Please select a CSV file to import:', $fileChoices);
+        $separator = $this->askQuestion($io, "Please select the separator for the file $file:", $separatorChoices);
+        $separator = array_search($separator, $separators, true);
+        $enclosure = $this->askQuestion($io, "Please select the enclosure for the file $file:", ['"', "'"]);
+        $escape    = $this->askQuestion($io, "Please select the escape character for the file $file:", ['\\', '/']);
 
-        /*$question = new ChoiceQuestion('Please select a line separator:', [',', ';'], 0);
-        $question->setErrorMessage(self::INVALID_CHOICE);
-        $selectedSeparator = $io->askQuestion($question);*/
+        $filePath         = realpath(self::STORAGE_PATH . "/$file");
+        $fileReaderConfig = (new FileReaderConfigDTO())
+            ->setFilePath($filePath)
+            ->setSeparator($separator)
+            ->setEnclosure($enclosure)
+            ->setEscape($escape);
 
-        $filePath = realpath(__DIR__ . '/../../storage/products/' . $selectedFile);
         $io->writeln("Importing products from path: $filePath");
 
-        $fileReader = FileReaderFactory::create($filePath);
-        $result     = $fileReader->save($filePath, new ProductRepository());
+        $fileReader = FileReaderFactory::create($fileReaderConfig);
+        $result     = $fileReader->save(new ProductRepository());
 
-        return $result ? Command::SUCCESS : Command::FAILURE;
+        if ($result) {
+            $io->success('Products imported successfully.');
+
+            return Command::SUCCESS;
+        }
+        $io->error('Import failed.');
+
+        return Command::FAILURE;
+    }
+
+    private function askQuestion(SymfonyStyle $io, string $questionText, array $choices): string
+    {
+        $question = new ChoiceQuestion($questionText, $choices, 0);
+        $question->setErrorMessage(self::INVALID_CHOICE);
+
+        return $io->askQuestion($question);
     }
 }

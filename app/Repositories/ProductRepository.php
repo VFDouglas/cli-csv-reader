@@ -24,7 +24,7 @@ class ProductRepository implements RepositoryInterface
         }
 
         $errors = [];
-        foreach ($data as $key => $line) {
+        foreach ($data as $key => &$line) {
             if (empty($line['gtin'])) {
                 $errors[] = "GTIN not informed at line " . ($key + 1) . ".";
                 continue;
@@ -41,14 +41,19 @@ class ProductRepository implements RepositoryInterface
                 $errors[] = "Description not informed at line " . ($key + 1) . ".";
                 continue;
             }
-            if (empty($line['price'])) {
+            if (strlen($line['price']) === 0) {
                 $errors[] = "Price not informed at line " . ($key + 1) . ".";
                 continue;
             }
-            if (empty($line['stock'])) {
+            if (strlen($line['stock']) === 0) {
                 $errors[] = "Stock not informed at line " . ($key + 1) . ".";
+                continue;
             }
+
+            $line['price'] = str_replace(',', '.', $line['price']);
+            $line['stock'] = str_replace(',', '.', $line['stock']);
         }
+
         if (!empty($errors)) {
             return (new InsertResultDTO())
                 ->setErrors($errors);

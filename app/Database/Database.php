@@ -4,35 +4,45 @@ namespace App\Database;
 
 use App\DTO\InsertResultDTO;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 class Database
 {
     private PDO $connection;
 
-    public function __construct()
+    public function __construct(PDO $connection = null)
     {
-        $this->connection = Connection::getInstance()->getConnection();
+        $this->connection = $connection ?? Connection::getInstance()->getConnection();
     }
 
     public function execute(string $sql, array $params = []): InsertResultDTO
     {
-        $stmt = $this->connection->prepare($sql);
-        $this->bindMultipleParams($stmt, $params);
+        $result = new InsertResultDTO();
 
-        $success = $stmt->execute();
-        $result  = new InsertResultDTO();
+        try {
+            $stmt = $this->connection->prepare($sql);
+            $this->bindMultipleParams($stmt, $params);
 
-        return $result
-            ->setErrors($stmt->errorInfo())
-            ->setLastInsertId($this->connection->lastInsertId())
-            ->setSuccess($success)
-            ->setAffectedRows($stmt->rowCount());
+            $success = $stmt->execute();
+
+            return $result
+                ->setErrors($stmt->errorInfo())
+                ->setLastInsertId($this->connection->lastInsertId())
+                ->setSuccess($success)
+                ->setAffectedRows($stmt->rowCount());
+        } catch (PDOException $e) {
+            return $result->setErrors([$e->getCode(), $e->getMessage(), 'PDOException'])->setSuccess(false);
+        }
     }
 
     public function batchInsert(string $table, array $rows, array $updateColumns = []): InsertResultDTO
     {
         $result = new InsertResultDTO();
+
+        if (empty($rows)) {
+            return $result->setErrors([null, 'No rows to insert', null])->setSuccess(false);
+        }
 
         $placeholders = [];
         $params       = [];
@@ -48,42 +58,39 @@ class Database
             $placeholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
         }
 
-        if (empty($updateColumns)) {
-            $sql = sprintf(
-                "INSERT INTO %s (%s) VALUES (%s)",
-                $table,
-                implode(', ', $rows),
-                implode(', ', $placeholders),
-            );
-        } else {
-            $sql = sprintf(
-                "INSERT INTO %s (%s) VALUES %s ON DUPLICATE KEY UPDATE %s",
-                $table,
-                implode(', ', $columns),
-                implode(', ', $placeholders),
-                implode(', ', array_map(fn($col) => "$col = VALUES($col)", $updateColumns)),
-            );
-        }
-        $stmt = $this->connection->prepare($sql);
-
-        foreach ($params as $paramKey => $paramValue) {
-            $this->bindParamType($stmt, $paramKey, $paramValue);
+        $sql = sprintf(
+            "INSERT INTO %s (%s) VALUES %s",
+            $table,
+            implode(', ', $columns),
+            implode(', ', $placeholders),
+        );
+        if (!empty($updateColumns)) {
+            $updates = implode(', ', array_map(fn($col) => "`$col` = VALUES(`$col`)", $updateColumns));
+            $sql     .= " ON DUPLICATE KEY UPDATE $updates";
         }
 
-        $success = $stmt->execute();
+        try {
+            $stmt = $this->connection->prepare($sql);
+            foreach ($params as $paramKey => $paramValue) {
+                $this->bindParamType($stmt, $paramKey, $paramValue);
+            }
+            $success = $stmt->execute();
 
-        return $result
-            ->setErrors($stmt->errorInfo())
-            ->setLastInsertId($this->connection->lastInsertId())
-            ->setSuccess($success)
-            ->setAffectedRows($stmt->rowCount());
+            return $result
+                ->setErrors($stmt->errorInfo())
+                ->setLastInsertId($this->connection->lastInsertId())
+                ->setSuccess($success)
+                ->setAffectedRows($stmt->rowCount());
+        } catch (PDOException $e) {
+            return $result->setErrors([$e->getCode(), $e->getMessage(), 'PDOException'])->setSuccess(false);
+        }
     }
 
     public function fetch(string $sql, array $params = []): array
     {
         $stmt = $this->connection->prepare($sql);
         $this->bindMultipleParams($stmt, $params);
-        $stmt->execute($params);
+        $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -96,6 +103,9 @@ class Database
                 break;
             case 'boolean':
                 $statement->bindValue(":$paramKey", $paramValue, PDO::PARAM_BOOL);
+                break;
+            case 'NULL':
+                $statement->bindValue(":$paramKey", $paramValue, PDO::PARAM_NULL);
                 break;
             default:
                 $statement->bindValue(":$paramKey", $paramValue);
