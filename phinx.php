@@ -12,8 +12,8 @@ return [
         'default_environment'     => 'development',
         'production'              => [
             'adapter' => env('DB_CONNECTION', 'mysql'),
-            'host'    => env('DB_HOST', 'localhost'),
-            'name'    => env('DB_NAME', 'default'),
+            'host'    => env('DB_HOST', 'mysql'),
+            'name'    => env('DB_NAME', 'store'),
             'user'    => env('DB_USERNAME', 'root'),
             'pass'    => env('DB_PASSWORD', 'root'),
             'port'    => env('DB_PORT', 3306),
@@ -21,8 +21,8 @@ return [
         ],
         'development'             => [
             'adapter' => env('DB_CONNECTION', 'mysql'),
-            'host'    => env('DB_HOST', 'localhost'),
-            'name'    => env('DB_NAME', 'default'),
+            'host'    => env('DB_HOST', 'mysql'),
+            'name'    => env('DB_NAME', 'store'),
             'user'    => env('DB_USERNAME', 'root'),
             'pass'    => env('DB_PASSWORD', 'root'),
             'port'    => env('DB_PORT', 3306),
@@ -30,8 +30,8 @@ return [
         ],
         'testing'                 => [
             'adapter' => env('DB_CONNECTION', 'mysql'),
-            'host'    => env('DB_HOST', 'localhost'),
-            'name'    => env('DB_NAME', 'default'),
+            'host'    => env('DB_HOST', 'mysql'),
+            'name'    => env('DB_NAME', 'store'),
             'user'    => env('DB_USERNAME', 'root'),
             'pass'    => env('DB_PASSWORD', 'root'),
             'port'    => env('DB_PORT', 3306),

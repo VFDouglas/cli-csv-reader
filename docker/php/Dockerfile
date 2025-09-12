@@ -11,8 +11,11 @@ WORKDIR /var/www/html
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 
-RUN apt-get update && apt-get install -y git libzip-dev unzip libicu-dev passwd && rm -rf /var/lib/apt/lists/*
-RUN docker-php-ext-install pdo_mysql zip intl && chown -R ${CONTAINER_USER}:${UID} /var/www/html
+RUN apt-get update && \
+    apt-get install -y git libicu-dev libzip-dev passwd unzip && \
+    rm -rf /var/lib/apt/lists/* && \
+    docker-php-ext-install pdo_mysql zip intl && \
+    chown -R ${CONTAINER_USER}:${UID} /var/www/html && \
+    echo "root:${CONTAINER_ROOT_PASSWORD}" | chpasswd
 
-RUN echo "root:${CONTAINER_ROOT_PASSWORD}" | chpasswd
 USER ${CONTAINER_USER}

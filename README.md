@@ -21,7 +21,15 @@ git clone https://github.com/VFDouglas/cli-csv-reader.git
 ```
 Run the installer script (Check file for details):
 ```
+# DEV
 ./install.sh
+
+# Production
+./install.sh production
+```
+Run migrations:
+```
+docker compose exec php vendor/bin/phinx migrate
 ```
 
 You can access the app containers with the command:

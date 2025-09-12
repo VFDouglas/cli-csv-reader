@@ -5,7 +5,6 @@
     "require": {
         "php": "~8.3",
         "robmorgan/phinx": "^0.16.10",
-        "phpunit/phpunit": "^12.3",
         "ext-pdo": "*",
         "symfony/console": "^7.3"
     },
@@ -17,10 +16,18 @@
             "app/Helpers/helpers.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Douglas Vicentini",
             "email": "douglas.dvferreira@gmail.com"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^12.3"
+    }
 }

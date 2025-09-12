@@ -25,11 +25,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_PASSWORD: ${DB_PASSWORD:-root}
     container_name: ${APP_NAME}_mysql_${APP_ENV}
-    healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 5s
-      timeout: 5s
-      retries: 5
 networks:
   internal:
     driver: bridge
