@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Factories;
+namespace App\Factory;
 
 use App\DTO\FileReaderConfigDTO;
-use App\Exceptions\UnsupportedFileFormatException;
-use App\FileReaders\CsvReader;
-use App\Interfaces\FileReaderInterface;
+use App\Exception\UnsupportedFileFormatException;
+use App\FileReader\CsvReader;
+use App\Interface\FileReaderInterface;
 
 class FileReaderFactory
 {

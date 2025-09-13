@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exception;
 
 use Exception;
 
-class MissingFileFieldException extends Exception
+class UnsupportedFileFormatException extends Exception
 {
     public function __construct(
-        string $message = 'A field is missing in the file',
+        string $message = 'File format not supported.',
         int $code = 0,
         ?Exception $previous = null
     ) {

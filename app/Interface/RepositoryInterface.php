@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Interfaces;
-
-use App\DTO\InsertResultDTO;
+namespace App\Interface;
 
 interface RepositoryInterface
 {

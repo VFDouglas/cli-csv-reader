@@ -1,13 +1,13 @@
 <?php
 
-namespace App\FileReaders;
+namespace App\FileReader;
 
 use App\DTO\FileReaderConfigDTO;
-use App\Exceptions\MissingFileFieldException;
-use App\Exceptions\UnableToOpenFileException;
-use App\Interfaces\FileReaderInterface;
-use App\Interfaces\QueryResultInterface;
-use App\Interfaces\RepositoryInterface;
+use App\Exception\MissingFileFieldException;
+use App\Exception\FileDoesNotExistException;
+use App\Interface\FileReaderInterface;
+use App\Interface\QueryResultInterface;
+use App\Interface\RepositoryInterface;
 use Generator;
 
 class CsvReader implements FileReaderInterface
@@ -18,46 +18,38 @@ class CsvReader implements FileReaderInterface
     {
     }
 
-    public function getFilePath(): string
-    {
-        return realpath($this->config->getFilePath());
-    }
-
-    public function getSeparator(): string
-    {
-        return $this->config->getSeparator();
-    }
-
-    public function getEnclosure(): string
-    {
-        return $this->config->getEnclosure();
-    }
-
-    public function getEscape(): string
-    {
-        return $this->config->getEscape();
-    }
-
     /**
-     * @throws UnableToOpenFileException
+     * @throws FileDoesNotExistException
      * @throws MissingFileFieldException
      */
     public function read(): Generator
     {
-        $handle = fopen($this->getFilePath(), 'r');
-        if ($handle === false) {
-            throw new UnableToOpenFileException('Unable to open file: ' . $this->getFilePath());
+        if (!file_exists($this->config->getFilePath())) {
+            throw new FileDoesNotExistException('File does not exist: ' . $this->config->getFilePath());
         }
+        $handle = fopen($this->config->getFilePath(), 'r');
 
-        $headers = fgetcsv($handle, 0, $this->getSeparator(), $this->getEnclosure(), $this->getEscape());
+        $headers = fgetcsv(
+            $handle,
+            0,
+            $this->config->getSeparator(),
+            $this->config->getEnclosure(),
+            $this->config->getEscape()
+        );
         if ($headers === false) {
             fclose($handle);
 
-            throw new MissingFileFieldException("File " . $this->getFilePath() . " has no headers");
+            throw new MissingFileFieldException("File " . basename($this->config->getFilePath()) . " has no headers");
         }
 
         while (
-            ($row = fgetcsv($handle, 0, $this->getSeparator(), $this->getEnclosure(), $this->getEscape())) !== false
+            ($row = fgetcsv(
+                $handle,
+                0,
+                $this->config->getSeparator(),
+                $this->config->getEnclosure(),
+                $this->config->getEscape()
+            )) !== false
         ) {
             if (count($headers) !== count($row)) {
                 throw new MissingFileFieldException(
@@ -71,7 +63,7 @@ class CsvReader implements FileReaderInterface
     }
 
     /**
-     * @throws UnableToOpenFileException|MissingFileFieldException
+     * @throws FileDoesNotExistException|MissingFileFieldException
      */
     public function save(RepositoryInterface $repository): bool
     {

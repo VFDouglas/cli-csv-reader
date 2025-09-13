@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Exceptions;
+namespace App\Exception;
 
 use Exception;
 
-class UnableToOpenFileException extends Exception
+class MissingFileFieldException extends Exception
 {
     public function __construct(
-        string $message = 'File could not be opened.',
+        string $message = 'A field is missing in the file',
         int $code = 0,
         ?Exception $previous = null
     ) {

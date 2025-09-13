@@ -1,25 +1,26 @@
 # cli-csv-reader
-A simple PHP CLI tool to read `.csv` files and import data into a MySQL database using Docker Compose.  
-This project demonstrates how to structure a lightweight, containerized data importer with extensibility.
+A lightweight PHP CLI tool to read `.csv` files and import data into a database.  
+This project demonstrates clean architecture, extensibility, and test-driven development in a containerized environment.
 
 ## 🚀 Features
-- PHP CLI container (with Composer)
-- MySQL 8.0 database container (with persistence)
-- Easy setup with Docker Compose
-- Extensible architecture (can be extended with Redis, queues, etc.)
+- PHP CLI container with Composer dependencies
+- MySQL 8.0 database container with persistent storage
+- Easy setup and teardown with Docker Compose
+- Extensible architecture (can add Redis, queues, or other services)
+- Unit and integration tests included
 
-## 🖥️Requirements
+## 🖥️ Requirements
 - Docker >= 20
 - Docker Compose >= 2
 - WSL2 (for Windows users)
 
-## ⚙️Installation
+## ⚙️ Installation
 
-Clone the project
+- Clone the project
 ```
 git clone https://github.com/VFDouglas/cli-csv-reader.git
 ```
-Run the installer script (Check file for details):
+- Run the installer script (Check file for details):
 ```
 # Development
 ./install.sh
@@ -27,13 +28,32 @@ Run the installer script (Check file for details):
 # Production
 ./install.sh production
 ```
-Run migrations:
+- Run migrations:
 ```
 docker compose exec php vendor/bin/phinx migrate
 ```
 
-You can access the app containers with the command:
+## 📂 Usage:
 ```
-# In this case PHP is the service name specified in the compose.yaml file
+# Enter the container
 docker compose exec php bash
+
+# Run the command
+php bin/console import:products
 ```
+- If you want to test custom files, just add them to the directory `storage/products`.
+- There are already sample files with distinct delimiters, enclosures and escape characters.
+
+## 🧪 Testing
+```
+# Inside the container
+vendor/bin/phpunit
+
+# Outside the container
+docker compose exec php vendor/bin/phpunit
+```
+
+## 💡 Notes
+- The project is designed to be easily extensible. You can add new file readers (JSON, XML, etc.) or new persistence layers without changing the core CLI logic.
+- Singleton, factories, DTOs and repositories are used to demonstrate clean and testable architecture.
+- All code is compatible with PHP 8.3+ and adheres to PSR standards.

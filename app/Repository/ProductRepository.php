@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repository;
 
 use App\Database\Database;
 use App\DTO\InsertResultDTO;
-use App\Interfaces\RepositoryInterface;
+use App\Interface\RepositoryInterface;
 
 class ProductRepository implements RepositoryInterface
 {

@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Interfaces;
+namespace App\Interface;
 
 interface FileReaderInterface
 {
-    public function getFilePath(): string;
-
     public function read();
 
     public function save(RepositoryInterface $repository): bool;

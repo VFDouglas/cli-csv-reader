@@ -3,9 +3,9 @@
 namespace App\Command;
 
 use App\DTO\FileReaderConfigDTO;
-use App\Exceptions\UnsupportedFileFormatException;
-use App\Factories\FileReaderFactory;
-use App\Repositories\ProductRepository;
+use App\Exception\UnsupportedFileFormatException;
+use App\Factory\FileReaderFactory;
+use App\Repository\ProductRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,6 +14,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ImportProductsCommand extends Command
 {
+    public const string PRODUCTS_IMPORTED = 'Products imported successfully';
+
     private const string INVALID_CHOICE = '🚨 Oops! "%s" is not a valid choice. Please try again.';
 
     private const string STORAGE_PATH = __DIR__ . '/../../storage/products';
@@ -65,7 +67,7 @@ class ImportProductsCommand extends Command
         $result     = $fileReader->save(new ProductRepository());
 
         if ($result) {
-            $io->success('Products imported successfully.');
+            $io->success(self::PRODUCTS_IMPORTED);
 
             return Command::SUCCESS;
         }

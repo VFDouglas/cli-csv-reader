@@ -2,7 +2,7 @@
 
 namespace App\Database;
 
-use App\Exceptions\DatabaseConnectionFailedException;
+use App\Exception\DatabaseConnectionFailedException;
 use PDO;
 use PDOException;
 
@@ -17,7 +17,8 @@ class Connection
      */
     private function __construct()
     {
-        $dsn = sprintf("mysql:host=%s;dbname=%s;charset=utf8mb4", env('DB_HOST'), env('DB_NAME'));
+        $dbName = defined('PHPUNIT_COMPOSER_INSTALL') ? env('DB_NAME_TESTS') : env('DB_NAME');
+        $dsn    = sprintf("mysql:host=%s;dbname=%s;charset=utf8mb4", env('DB_HOST'), $dbName);
 
         try {
             $this->connection = new PDO(

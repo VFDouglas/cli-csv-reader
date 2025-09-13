@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-use App\Interfaces\QueryResultInterface;
+use App\Interface\QueryResultInterface;
 
 class InsertResultDTO implements QueryResultInterface
 {
