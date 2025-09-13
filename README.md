@@ -1,4 +1,4 @@
-# cli-csv-reader
+# cli-file-reader
 A lightweight PHP CLI tool to read `.csv` files and import data into a database.  
 This project demonstrates clean architecture, extensibility, and test-driven development in a containerized environment.
 
