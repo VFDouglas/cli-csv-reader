@@ -21,7 +21,7 @@ git clone https://github.com/VFDouglas/cli-csv-reader.git
 ```
 Run the installer script (Check file for details):
 ```
-# DEV
+# Development
 ./install.sh
 
 # Production

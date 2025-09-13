@@ -31,7 +31,7 @@ return [
         'testing'                 => [
             'adapter' => env('DB_CONNECTION', 'mysql'),
             'host'    => env('DB_HOST', 'mysql'),
-            'name'    => env('DB_NAME', 'store'),
+            'name'    => env('DB_NAME_TESTS'),
             'user'    => env('DB_USERNAME', 'root'),
             'pass'    => env('DB_PASSWORD', 'root'),
             'port'    => env('DB_PORT', 3306),

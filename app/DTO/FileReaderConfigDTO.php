@@ -17,11 +17,9 @@ class FileReaderConfigDTO
         return $this->filePath;
     }
 
-    public function setFilePath(string $filePath): FileReaderConfigDTO
+    public function __construct(string $filePath)
     {
         $this->filePath = $filePath;
-
-        return $this;
     }
 
     public function getSeparator(): ?string

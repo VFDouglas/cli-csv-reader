@@ -28,3 +28,20 @@ function env(string $variable, mixed $default = null): mixed
 
     return $default;
 }
+
+/**
+ * @param array $command Each command should be an array item. Ex.: ['vendor/bin/phinx', 'migrate']
+ * @return void
+ */
+function runShellScript(array $command): void
+{
+    $cmd = implode(' ', array_map('escapeshellarg', $command));
+    exec($cmd . ' 2>&1', $output, $exitCode);
+
+    if ($exitCode !== 0) {
+        fwrite(STDERR, "❌ Failed running: $cmd\n" . implode("\n", $output) . "\n");
+        exit(1);
+    }
+
+    echo "✅ " . implode(' ', $command) . "\n";
+}

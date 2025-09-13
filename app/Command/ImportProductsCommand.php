@@ -54,8 +54,7 @@ class ImportProductsCommand extends Command
         $escape    = $this->askQuestion($io, "Please select the escape character for the file $file:", ['\\', '/']);
 
         $filePath         = realpath(self::STORAGE_PATH . "/$file");
-        $fileReaderConfig = (new FileReaderConfigDTO())
-            ->setFilePath($filePath)
+        $fileReaderConfig = (new FileReaderConfigDTO($filePath))
             ->setSeparator($separator)
             ->setEnclosure($enclosure)
             ->setEscape($escape);
