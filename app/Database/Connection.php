@@ -18,7 +18,13 @@ class Connection
     private function __construct()
     {
         $dbName = defined('PHPUNIT_COMPOSER_INSTALL') ? env('DB_NAME_TESTS') : env('DB_NAME');
-        $dsn    = sprintf("mysql:host=%s;dbname=%s;charset=utf8mb4", env('DB_HOST'), $dbName);
+        $dsn    = sprintf(
+            "mysql:host=%s;dbname=%s;port=%s;charset=%s",
+            env('DB_HOST'),
+            $dbName,
+            env('DB_PORT'),
+            env('DB_CHARSET')
+        );
 
         try {
             $this->connection = new PDO(

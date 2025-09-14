@@ -20,7 +20,7 @@ services:
       - ./.docker/mysql/dbdata:/var/lib/mysql
       - ./docker/mysql:/docker-entrypoint-initdb.d
     ports:
-      - '3306:3306'
+      - '${DB_PORT_HOST}:3306'
     environment:
       MYSQL_DATABASE: ${DB_NAME:-store}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
