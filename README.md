@@ -13,12 +13,13 @@ This project demonstrates clean architecture, extensibility, and test-driven dev
 - Docker >= 20
 - Docker Compose >= 2
 - WSL2 (for Windows users)
+- For usage without Docker, check README-no-docker.md
 
 ## ⚙️ Installation
 
 - Clone the project
 ```
-git clone https://github.com/VFDouglas/cli-csv-reader.git
+git clone https://github.com/VFDouglas/cli-file-reader.git
 ```
 - Run the installer script (Check file for details):
 ```
