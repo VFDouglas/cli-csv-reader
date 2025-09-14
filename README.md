@@ -47,13 +47,19 @@ php bin/console import:products
 ## 🧪 Testing
 ```
 # Inside the container
-vendor/bin/phpunit
+vendor/bin/phpunit --testdox
 
 # Outside the container
-docker compose exec php vendor/bin/phpunit
+docker compose exec php vendor/bin/phpunit --testdox
 ```
 
 ## 💡 Notes
 - The project is designed to be easily extensible. You can add new file readers (JSON, XML, etc.) or new persistence layers without changing the core CLI logic.
 - Singleton, factories, DTOs and repositories are used to demonstrate clean and testable architecture.
 - All code is compatible with PHP 8.3+ and adheres to PSR standards.
+
+## ❌ Common Errors
+- MySQL port already being used:
+  - Go to `.env` and change the value of `DB_PORT_HOST`.
+- Cannot load build context (while building a new image):
+  - Delete `.docker` directory (after copying plausible data) and run the command again.
